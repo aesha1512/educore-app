@@ -1,0 +1,16 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f6f6f3;
+  color: #1c2033;
+}
+
+:focus-visible {
+  outline: 2px solid #2f5d50;
+  outline-offset: 2px;
+  border-radius: 4px;
+}

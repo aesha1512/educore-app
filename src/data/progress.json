@@ -1,0 +1,21 @@
+{
+  "breakdown": [
+    { "label": "Courses", "value": 45, "color": "#2f5d50" },
+    { "label": "Assignments", "value": 32, "color": "#e1a23c" },
+    { "label": "Quizzes", "value": 23, "color": "#c56e5a" }
+  ],
+  "weeklyActivity": [
+    { "day": "Mon", "hours": 1.2 },
+    { "day": "Tue", "hours": 0.8 },
+    { "day": "Wed", "hours": 1.5 },
+    { "day": "Thu", "hours": 0.4 },
+    { "day": "Fri", "hours": 2.1 },
+    { "day": "Sat", "hours": 0.6 },
+    { "day": "Sun", "hours": 0.9 }
+  ],
+  "reminders": [
+    { "id": "r1", "title": "Case study: UI/UX", "due": "Fri, 4 Sep" },
+    { "id": "r2", "title": "Research proposal draft", "due": "Wed, 9 Sep" },
+    { "id": "r3", "title": "Web dev checkpoint quiz", "due": "Mon, 14 Sep" }
+  ]
+}   

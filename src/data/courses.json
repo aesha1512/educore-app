@@ -1,0 +1,62 @@
+[
+  {
+    "id": "c1",
+    "title": "UI/UX Foundations with Figma",
+    "category": "Design",
+    "instructor": "Priya Nathan",
+    "duration": "6h 30m",
+    "lessons": 18,
+    "level": "Beginner",
+    "description": "Learn the core principles of interface design and build a working prototype in Figma.",
+    "enrolled": true,
+    "progress": 62
+  },
+  {
+    "id": "c2",
+    "title": "Web Development Bootcamp",
+    "category": "Development",
+    "instructor": "Sam Whitfield",
+    "duration": "14h 00m",
+    "lessons": 32,
+    "level": "Beginner",
+    "description": "Go from HTML basics to a deployed full-stack project.",
+    "enrolled": false,
+    "progress": 0
+  },
+  {
+    "id": "c3",
+    "title": "Data Structures & Algorithms",
+    "category": "Development",
+    "instructor": "Lena Cho",
+    "duration": "11h 45m",
+    "lessons": 28,
+    "level": "Advanced",
+    "description": "Build strong problem-solving fundamentals with practical coding exercises.",
+    "enrolled": false,
+    "progress": 0
+  },
+  {
+    "id": "c4",
+    "title": "Introduction to UI Animation",
+    "category": "Design",
+    "instructor": "Priya Nathan",
+    "duration": "4h 20m",
+    "lessons": 12,
+    "level": "Beginner",
+    "description": "Bring interfaces to life with purposeful motion and transitions.",
+    "enrolled": false,
+    "progress": 0
+  },
+  {
+    "id": "c5",
+    "title": "Ethical Hacking Fundamentals",
+    "category": "Security",
+    "instructor": "Owen Reyes",
+    "duration": "9h 10m",
+    "lessons": 24,
+    "level": "Intermediate",
+    "description": "A hands-on introduction to penetration testing and reporting.",
+    "enrolled": true,
+    "progress": 28
+  }
+]

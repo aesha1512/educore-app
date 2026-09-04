@@ -4,7 +4,7 @@ A frontend web application for course discovery, enrolment, and progress trackin
 
 ## Live Application
 
-🔗 [Deployed App URL — add after deployment]
+🔗 🔗 [https://educore-app-lovat.vercel.app](https://educore-app-lovat.vercel.app)
 
 ## Team Members
 

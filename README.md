@@ -53,3 +53,34 @@ A frontend web application for course discovery, enrolment, and progress trackin
 4. Open the URL shown in your terminal (usually `http://localhost:5173`)
 
 ## Project Structure
+
+## Backend (Express + MySQL)
+
+The Express API lives in the `backend/` folder and uses a MySQL database called `educore_db` with three tables: `users`, `courses` and `enrolments`.
+
+### Run the backend
+1. Install MySQL and create the database: `CREATE DATABASE educore_db;`
+2. Create the `users`, `courses` and `enrolments` tables.
+3. In `backend/`, create a `.env` file with these variables:
+```
+   DB_HOST=localhost
+   DB_USER=your_mysql_user
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=educore_db
+   PORT=5000
+   JWT_SECRET=any_long_random_string
+```
+4. Install and start the server:
+```
+   cd backend
+   npm install
+   node server.js
+```
+   It runs at http://localhost:5000.
+
+### Run the frontend
+From the project root: `npm install` then `npm run dev`. It runs at http://localhost:5173 and calls the API at http://localhost:5000.
+
+### API routes
+- Public: GET /api/courses, GET /api/courses/:id, POST /api/register, POST /api/login
+- Needs a JWT: POST /api/enrolments, GET /api/enrolments/:userId, PUT /api/enrolments/:id, DELETE /api/enrolments/:id

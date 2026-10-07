@@ -1,39 +1,37 @@
 import { useState } from 'react';
+import { authFetch } from '../../../utils/api';
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export default function EnrolForm({ course, onEnrol }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [errors, setErrors] = useState({});
+export default function EnrolForm({ course, userId, onEnrolled }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  function validate() {
-    const newErrors = {};
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
 
-    if (!name.trim()) {
-      newErrors.name = 'Please enter your name.';
-    }
+    try {
+      const response = await authFetch('/api/enrolments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, courseId: course.id }),
+      });
 
-    if (!email.trim()) {
-      newErrors.email = 'Please enter your email.';
-    } else if (!EMAIL_PATTERN.test(email)) {
-      newErrors.email = 'Please enter a valid email address.';
-    }
+      const data = await response.json();
 
-    return newErrors;
-  }
+      if (!response.ok) {
+        setError(data.error || 'Failed to enrol');
+        setSubmitting(false);
+        return;
+      }
 
-  function handleSubmit(e) {
-    e.preventDefault(); // stops the page from reloading (default HTML form behaviour)
-
-    const validationErrors = validate();
-    setErrors(validationErrors);
-
-    // Only proceed if there are no errors
-    if (Object.keys(validationErrors).length === 0) {
-      onEnrol(course.id);
       setSubmitted(true);
+      setSubmitting(false);
+      onEnrolled();
+    } catch (err) {
+      setError('Could not connect to the server');
+      setSubmitting(false);
     }
   }
 
@@ -44,37 +42,14 @@ export default function EnrolForm({ course, onEnrol }) {
   return (
     <form onSubmit={handleSubmit}>
       <h3>Enrol in this course</h3>
+      <p style={{ color: '#666', fontSize: '13px', marginBottom: '12px' }}>
+        Click below to enrol — your account details are already on file.
+      </p>
 
-      <div>
-        <label htmlFor="name">Full name</label>
-        <br />
-        <input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          aria-invalid={Boolean(errors.name)}
-          aria-describedby={errors.name ? 'name-error' : undefined}
-        />
-        {errors.name && <p style={{ color: 'red', fontSize: '13px' }}>{errors.name}</p>}
-      </div>
+      {error && <p style={{ color: 'red', fontSize: '13px' }}>{error}</p>}
 
-      <div style={{ marginTop: '12px' }}>
-        <label htmlFor="email">Email address</label>
-        <br />
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          aria-invalid={Boolean(errors.email)}
-          aria-describedby={errors.email ? 'email-error' : undefined}
-        />
-        {errors.email && <p style={{ color: 'red', fontSize: '13px' }}>{errors.email}</p>}
-      </div>
-
-      <button type="submit" style={{ marginTop: '14px' }}>
-        Enrol now
+      <button type="submit" disabled={submitting}>
+        {submitting ? 'Enrolling...' : 'Enrol now'}
       </button>
     </form>
   );

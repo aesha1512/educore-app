@@ -1,19 +1,42 @@
-import { useMemo, useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useEffect, useMemo, useState } from 'react';
 import CourseCard from '../components/features/courses/CourseCard';
+import { authFetch, API_BASE } from '../utils/api';
 
-export default function Courses() {
-  const { courses, status } = useApp();
+export default function Courses({ user }) {
+  const [courses, setCourses] = useState([]);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
+  const [status, setStatus] = useState('loading');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
 
-  // Build the list of category buttons from whatever categories exist in the data
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [coursesRes, enrolmentsRes] = await Promise.all([
+          fetch(`${API_BASE}/api/courses`),
+          authFetch(`/api/enrolments/${user.id}`),
+        ]);
+
+        const coursesData = await coursesRes.json();
+        const enrolmentsData = await enrolmentsRes.json();
+
+        setCourses(coursesData);
+        setEnrolledCourseIds(enrolmentsData.map((e) => e.courseId));
+        setStatus('ready');
+      } catch (err) {
+        console.error(err);
+        setStatus('error');
+      }
+    }
+
+    loadData();
+  }, [user.id]);
+
   const categories = useMemo(() => {
     const unique = new Set(courses.map((c) => c.category));
     return ['All', ...unique];
   }, [courses]);
 
-  // Filter the courses list based on both the search text and selected category
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
       const matchesCategory = category === 'All' || course.category === category;
@@ -24,6 +47,10 @@ export default function Courses() {
 
   if (status === 'loading') {
     return <p>Loading courses…</p>;
+  }
+
+  if (status === 'error') {
+    return <p>Could not load courses. Is the backend server running?</p>;
   }
 
   return (
@@ -64,7 +91,11 @@ export default function Courses() {
       ) : (
         <div>
           {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard
+              key={course.id}
+              course={course}
+              isEnrolled={enrolledCourseIds.includes(course.id)}
+            />
           ))}
         </div>
       )}

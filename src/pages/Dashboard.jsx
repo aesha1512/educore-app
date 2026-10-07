@@ -1,27 +1,60 @@
+import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { useApp } from '../context/AppContext';
+import { authFetch } from '../utils/api';
 
-export default function Dashboard() {
-  const { courses, progress, status } = useApp();
+// Weekly study activity is still simulated for now, since we aren't tracking
+// actual study-time sessions in the database yet — this could be a future enhancement.
+const weeklyActivity = [
+  { day: 'Mon', hours: 1.2 },
+  { day: 'Tue', hours: 0.8 },
+  { day: 'Wed', hours: 1.5 },
+  { day: 'Thu', hours: 0.4 },
+  { day: 'Fri', hours: 2.1 },
+  { day: 'Sat', hours: 0.6 },
+  { day: 'Sun', hours: 0.9 },
+];
+
+export default function Dashboard({ user }) {
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [status, setStatus] = useState('loading');
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await authFetch(`/api/enrolments/${user.id}`);
+        if (!response.ok) {
+          setStatus('error');
+          return;
+        }
+        const data = await response.json();
+        setEnrolledCourses(data);
+        setStatus('ready');
+      } catch (err) {
+        console.error(err);
+        setStatus('error');
+      }
+    }
+
+    loadData();
+  }, [user.id]);
 
   if (status === 'loading') {
     return <p>Loading dashboard…</p>;
   }
 
-  const enrolledCourses = courses.filter((c) => c.enrolled);
+  if (status === 'error') {
+    return <p>Could not load your dashboard. Is the backend server running?</p>;
+  }
 
   return (
     <div>
-      <h1>Hello, Student 👋</h1>
+      <h1>Hello, {user.name} 👋</h1>
       <p>Let's pick up where you left off.</p>
 
       <h3 style={{ marginTop: '30px' }}>Weekly study activity</h3>
-      <p style={{ color: '#666', fontSize: '13px', marginBottom: '8px' }}>
-        Hours studied each day this week, based on the chart below.
-      </p>
       <div style={{ width: '100%', maxWidth: '500px', height: 220 }}>
         <ResponsiveContainer>
-          <BarChart data={progress.weeklyActivity}>
+          <BarChart data={weeklyActivity}>
             <XAxis dataKey="day" />
             <Tooltip formatter={(value) => [`${value}h`, 'Studied']} />
             <Bar dataKey="hours" fill="#2f5d50" radius={[4, 4, 0, 0]} />
@@ -35,21 +68,12 @@ export default function Dashboard() {
       ) : (
         <ul>
           {enrolledCourses.map((course) => (
-            <li key={course.id}>
+            <li key={course.enrolmentId}>
               {course.title} — {course.progress}% complete
             </li>
           ))}
         </ul>
       )}
-
-      <h3 style={{ marginTop: '30px' }}>Upcoming deadlines</h3>
-      <ul>
-        {progress.reminders.map((r) => (
-          <li key={r.id}>
-            {r.title} — due {r.due}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

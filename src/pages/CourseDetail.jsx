@@ -1,24 +1,57 @@
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
 import EnrolForm from '../components/features/courses/EnrolForm';
+import { authFetch, API_BASE } from '../utils/api';
 
-export default function CourseDetail() {
+export default function CourseDetail({ user }) {
   const { id } = useParams();
-  const { courses, status, toggleEnroll } = useApp();
+  const [course, setCourse] = useState(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [status, setStatus] = useState('loading');
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [courseRes, enrolmentsRes] = await Promise.all([
+          fetch(`${API_BASE}/api/courses/${id}`),
+          authFetch(`/api/enrolments/${user.id}`),
+        ]);
+
+        if (!courseRes.ok) {
+          setStatus('not-found');
+          return;
+        }
+
+        const courseData = await courseRes.json();
+        const enrolmentsData = await enrolmentsRes.json();
+
+        setCourse(courseData);
+        setIsEnrolled(enrolmentsData.some((e) => e.courseId === courseData.id));
+        setStatus('ready');
+      } catch (err) {
+        console.error(err);
+        setStatus('error');
+      }
+    }
+
+    loadData();
+  }, [id, user.id]);
 
   if (status === 'loading') {
     return <p>Loading…</p>;
   }
 
-  const course = courses.find((c) => c.id === id);
-
-  if (!course) {
+  if (status === 'not-found') {
     return (
       <div>
         <p>Course not found.</p>
         <Link to="/courses">Back to courses</Link>
       </div>
     );
+  }
+
+  if (status === 'error') {
+    return <p>Could not load this course. Is the backend server running?</p>;
   }
 
   return (
@@ -30,10 +63,14 @@ export default function CourseDetail() {
 
       <hr style={{ margin: '20px 0' }} />
 
-      {course.enrolled ? (
+      {isEnrolled ? (
         <p>You're already enrolled in this course.</p>
       ) : (
-        <EnrolForm course={course} onEnrol={toggleEnroll} />
+        <EnrolForm
+          course={course}
+          userId={user.id}
+          onEnrolled={() => setIsEnrolled(true)}
+        />
       )}
     </div>
   );
